@@ -1,5 +1,6 @@
 package com.springboot.firebaseStorage.infra.firebase;
 
+import com.springboot.firebaseStorage.exceptions.FileSizeException;
 import org.apache.tika.Tika;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
@@ -16,6 +17,10 @@ public class ImageValidator {
     public void validateImage(MultipartFile file) throws IOException {
         if (file == null || file.isEmpty()) {
             throw new IllegalArgumentException("File cannot be empty");
+        }
+
+        if (file.getSize() > 5 * 1024 * 1024) {
+            throw new FileSizeException("File size exceeds the maximum limit of 5MB");
         }
 
         try {

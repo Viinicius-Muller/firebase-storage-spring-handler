@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 import java.io.IOException;
 
 @Configuration
@@ -31,7 +31,7 @@ public class FirebaseConfig {
                 System.out.println("Firebase application has been initialized successfully.");
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new IllegalStateException("Failed to initialize Firebase application", e);
         }
     }
 }

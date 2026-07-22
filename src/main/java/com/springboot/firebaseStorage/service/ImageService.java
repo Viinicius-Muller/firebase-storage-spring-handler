@@ -4,7 +4,6 @@ import com.google.cloud.storage.Blob;
 import com.google.cloud.storage.Bucket;
 import com.google.firebase.cloud.StorageClient;
 import com.springboot.firebaseStorage.infra.firebase.ImageValidator;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -14,11 +13,14 @@ import java.io.IOException;
 import java.util.UUID;
 
 @Service
-@RequiredArgsConstructor
 public class ImageService {
     private final ImageValidator imageValidator;
-    @Value("${firebase.storage-bucket}")
     private final String bucketName;
+
+    public ImageService(ImageValidator imageValidator, @Value("${firebase.config.storage-bucket}") String bucketName) {
+        this.imageValidator = imageValidator;
+        this.bucketName = bucketName;
+    }
 
     public String uploadImage(MultipartFile file) throws IOException {
         // Validate the image file

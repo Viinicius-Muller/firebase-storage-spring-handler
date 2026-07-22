@@ -4,6 +4,8 @@ import com.google.cloud.storage.Blob;
 import com.google.cloud.storage.Bucket;
 import com.google.firebase.cloud.StorageClient;
 import com.springboot.firebaseStorage.infra.firebase.ImageValidator;
+import com.springboot.firebaseStorage.model.ImageMetadata;
+import com.springboot.firebaseStorage.repository.ImageMetadataRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -16,10 +18,12 @@ import java.util.UUID;
 public class ImageService {
     private final ImageValidator imageValidator;
     private final String bucketName;
+    private final ImageMetadataRepository repository;
 
-    public ImageService(ImageValidator imageValidator, @Value("${firebase.config.storage-bucket}") String bucketName) {
+    public ImageService(ImageValidator imageValidator, @Value("${firebase.config.storage-bucket}") String bucketName, ImageMetadataRepository imageMetadataRepository) {
         this.imageValidator = imageValidator;
         this.bucketName = bucketName;
+        this.repository = imageMetadataRepository;
     }
 
     public String uploadImage(MultipartFile file) throws IOException {
@@ -28,12 +32,20 @@ public class ImageService {
 
         // Upload the image to Firebase Storage
         String extension = imageValidator.getSanitizedExtension(file);
-        String fileName = UUID.randomUUID().toString() + "." + extension;
+        String fileName = UUID.randomUUID().toString() + extension;
         String storagePath = "images/" + fileName;
 
         Bucket bucket = StorageClient.getInstance().bucket(bucketName);
         bucket.create(storagePath, file.getInputStream(), file.getContentType());
 
+        ImageMetadata imageMetadata = new ImageMetadata();
+
+        imageMetadata.setSize(file.getSize());
+        imageMetadata.setStorageFileName(fileName);
+        imageMetadata.setOriginalFileName(file.getOriginalFilename());
+        imageMetadata.setMimeType(file.getContentType());
+
+        repository.save(imageMetadata);
         return fileName;
     }
 

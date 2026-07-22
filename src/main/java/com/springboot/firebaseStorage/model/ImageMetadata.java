@@ -20,6 +20,7 @@ public class ImageMetadata {
     // User's original upload FileName
     private String originalFileName;
 
-    private Long Size;
+    // KB
+    private Long size;
     private String mimeType;
 }

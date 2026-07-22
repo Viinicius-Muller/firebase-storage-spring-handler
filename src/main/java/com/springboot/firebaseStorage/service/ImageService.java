@@ -5,6 +5,7 @@ import com.google.cloud.storage.Bucket;
 import com.google.firebase.cloud.StorageClient;
 import com.springboot.firebaseStorage.infra.firebase.ImageValidator;
 import com.springboot.firebaseStorage.model.ImageMetadata;
+import com.springboot.firebaseStorage.model.ImageMetadataResponseDTO;
 import com.springboot.firebaseStorage.repository.ImageMetadataRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -26,7 +27,7 @@ public class ImageService {
         this.repository = imageMetadataRepository;
     }
 
-    public String uploadImage(MultipartFile file) throws IOException {
+    public ImageMetadataResponseDTO uploadImage(MultipartFile file) throws IOException {
         // Validate the image file
         imageValidator.validateImage(file);
 
@@ -46,7 +47,7 @@ public class ImageService {
         imageMetadata.setMimeType(file.getContentType());
 
         repository.save(imageMetadata);
-        return fileName;
+        return new ImageMetadataResponseDTO(imageMetadata);
     }
 
     public byte[] downloadImage(String fileName) throws IOException {
@@ -58,6 +59,11 @@ public class ImageService {
         }
 
         return blob.getContent();
+    }
+
+    public ImageMetadata getImageMetadataById(Long id) throws FileNotFoundException {
+        return repository.findById(id)
+                .orElseThrow(() -> new FileNotFoundException("File not found by id"));
     }
 
     public String getMimeType(String fileName) {

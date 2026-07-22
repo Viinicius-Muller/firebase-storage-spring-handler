@@ -36,7 +36,7 @@ public class ImageController {
         }
     }
 
-    @GetMapping("/{filename}")
+    @GetMapping("/{fileName}")
     public ResponseEntity<byte[]> downloadImage(@PathVariable String fileName) {
         try {
             byte[] imageBytes = imageService.downloadImage(fileName);
